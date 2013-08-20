@@ -11,5 +11,6 @@ Given /^the following movies exist:$/ do |table|
 end
 
 Then /^the director of "([^"]*)" should be "([^"]*)"$/ do |arg1, arg2|
-  pending # express the regexp above with the code you wish you had
+  # express the regexp above with the code you wish you had
+  page.body.should match(/#{arg1}.*Director.*#{arg2}/m)
 end
