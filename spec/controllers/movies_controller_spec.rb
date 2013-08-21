@@ -1,11 +1,35 @@
 require 'spec_helper'
 
 describe MoviesController do
-	describe 'adds a director to an existing movie'
-		it 'should receive the directors name'
-		it 'should find the movie to update'
-		it 'should call the model method that updates the movie'
-		it 'should redirect to the movie details page'
+	describe 'adds a director to an existing movie' do
+		before :each do
+			@m = mock(Movie, :title => 'Alien', :director => nil, :id => '3')			
+			#@m_new = mock(Movie, :title => 'Alien', :director => 'Ridley Scott', :id => '3')			
+			@m_new = ['title' => 'Alien', 'director' => 'Ridley Scott', 'id' => '3']			
+			#@fake_movie = [@m_new]
+			Movie.stub(:find).with('3').and_return(@m)
+			@m.stub(:update_attributes!).with(@m_new).and_return(true)
+		end
+		it 'should find the movie to update' do
+			Movie.should_receive(:find).with('3').and_return(@m)
+			put :update, {:id => '3', :movie => @m_new}
+		end
+
+		it 'should call the model method that updates the movie' do
+			#@m.should_receive(:update_attributes!).with(@m_new).and_return(true)
+			@m.should_receive(:update_attributes!).with(@m_new).and_return(true)
+			put :update, {:id => '3', :movie => @m_new}
+		end
+		it 'should generate a flash notice that the movie was updated' do
+			#Movie.should_receive(:find).with('1').and_return(@m1)
+			put :update, {:id => '3', :movie => @m_new}
+			flash[:notice].should_not be_nil
+		end
+		it 'should redirect to the movie details page' do
+			put :update, {:id => '3', :movie => @m_new}
+			response.should redirect_to(movie_path(@m))
+		end
+	end	
 
 	describe 'searching for movies by director' do
 		before :each do
