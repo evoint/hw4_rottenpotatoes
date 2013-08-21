@@ -7,10 +7,10 @@ class MoviesController < ApplicationController
   end
 
   def similar
-    #id = params[:id] # retrieve movie ID from URI route
-    #@movie = Movie.find(id) # look up movie by unique ID
-    # will render app/views/movies/show.<extension> by default
-    @movies = Movie.similar_movies(params[:movie_id])
+    if (@movies = Movie.similar_movies(params[:movie_id])) == nil
+      flash[:notice] = "Movie has no director."
+      redirect_to movies_path
+    end
   end
 
   def index
