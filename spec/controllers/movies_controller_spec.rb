@@ -39,6 +39,7 @@ describe MoviesController do
 			@m1 = mock(Movie, :title => 'Star Wars', :director => nil, :id => '1')
 			@fake_results = nil
 			Movie.stub(:similar_movies).with('1').and_return(@fake_results)
+			Movie.stub(:find).with('1').and_return(@m1)
 		end		
 		it 'should follow a route and call a method for find similar movies' do
 			post :similar, {:movie_id => '1'}
@@ -53,6 +54,7 @@ describe MoviesController do
 			assigns(:movies).should == @fake_results
 		end
 		it 'should generate a flash notice that the movie has no director info' do
+			Movie.should_receive(:find).with('1').and_return(@m1)
 			post :similar, {:movie_id => '1'}
 			flash[:notice].should_not be_nil
 		end
