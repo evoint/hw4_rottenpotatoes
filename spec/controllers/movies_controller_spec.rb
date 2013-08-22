@@ -60,6 +60,10 @@ describe MoviesController do
 			Movie.stub(:find).with('3').and_return(@m)
 			@m.stub(:update_attributes!).with(@m_new).and_return(true)
 		end
+		it 'should load the edit page with the movie details' do
+			Movie.should_receive(:find).with('3').and_return(@m)
+			get :edit, {:id => '3'}
+		end
 		it 'should find the movie to update' do
 			Movie.should_receive(:find).with('3').and_return(@m)
 			put :update, {:id => '3', :movie => @m_new}
@@ -76,6 +80,10 @@ describe MoviesController do
 		it 'should redirect to the movie details page' do
 			put :update, {:id => '3', :movie => @m_new}
 			response.should redirect_to(movie_path(@m))
+		end
+		it 'should show the updated Movie' do
+			Movie.should_receive(:find).with('3').and_return(@m_new)
+			get :show, {:id => '3'}
 		end
 	end	
 
@@ -132,6 +140,53 @@ describe MoviesController do
 		end
 		it 'should redirect to the index template' do
 			post :similar, {:movie_id => '1'}
+			response.should redirect_to(movies_path)
+		end
+	end
+
+	describe 'creating a new movie' do
+		before :each do
+			@m1 = mock(Movie, :title => 'Alien', :rating => 'G', :director => 'Ridley Scott', :release_date => '25-Nov-1992', :id => '3')
+			@m_new = ['title' => 'Alien', 'rating' => 'G', 'director' => 'Ridley Scott', 'release_date' => '25-Nov-1992']
+			Movie.stub(:create!).with(@m_new).and_return(@m1)					
+		end
+		it 'should follow a route and call a method to create a movie' do
+			post :create, {:movie => @m_new}
+		end
+		it 'should call the model method that creates a movie' do
+			Movie.should_receive(:create!).with(@m_new).and_return(@m1)
+			post :create, {:movie => @m_new}
+		end
+		it 'should generate a flash notice that the movie was created' do
+			post :create, {:movie => @m_new}
+			flash[:notice].should_not be_nil
+		end
+		it 'should redirect to the index template' do
+			post :create, {:movie => @m_new}
+			response.should redirect_to(movies_path)
+		end
+	end
+
+	describe 'deleting a movie' do
+		before :each do
+			@m1 = mock(Movie, :title => 'Alien', :rating => 'G', :director => 'Ridley Scott', :release_date => '25-Nov-1992', :id => '3')
+			#@m_new = ['title' => 'Alien', 'rating' => 'G', 'director' => 'Ridley Scott', 'release_date' => '25-Nov-1992']
+			Movie.stub(:find).with('3').and_return(@m1)
+			@m1.stub(:destroy)
+		end
+		it 'should follow a route and call a method to delete a movie' do
+			delete :destroy, {:id => '3'}
+		end
+		it 'should call the model method that deletes a movie' do
+			@m1.should_receive(:destroy)
+			delete :destroy, {:id => '3'}
+		end
+		it 'should generate a flash notice that the movie was created' do
+			delete :destroy, {:id => '3'}
+			flash[:notice].should_not be_nil
+		end
+		it 'should redirect to the index template' do
+			delete :destroy, {:id => '3'}
 			response.should redirect_to(movies_path)
 		end
 	end

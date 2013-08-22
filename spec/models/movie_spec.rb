@@ -23,4 +23,11 @@ describe Movie do
       end
     end
   end	
+
+  describe 'returns all ratings' do
+    it 'should not be nil' do
+      Movie.all_ratings.should_not == nil
+    end
+  end
+
 end
